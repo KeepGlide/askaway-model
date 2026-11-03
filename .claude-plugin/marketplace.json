@@ -1,0 +1,16 @@
+{
+  "name": "keepglide-local",
+  "description": "Local marketplace for the AskAway Model plugin, for installing from a downloaded zip.",
+  "owner": {
+    "name": "Sophia Phillipa (KeepGlide)",
+    "url": "https://keepglide.com"
+  },
+  "plugins": [
+    {
+      "name": "askaway-model",
+      "source": "./",
+      "description": "A decision model for Claude Code: MCP tools, a skill and hooks that consult the JEV gateway. Needs the local gateway.",
+      "version": "1.3.0-beta.2"
+    }
+  ]
+}

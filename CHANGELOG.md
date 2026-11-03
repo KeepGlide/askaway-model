@@ -6,6 +6,12 @@ versions follow SemVer and the gateway's `package.json`. The measurements behind
 
 ## [Unreleased]
 
+### Added
+
+- A root `.claude-plugin/marketplace.json` (marketplace `keepglide-local`, plugin `askaway-model` at `./`), so the
+  downloaded `.zip` installs offline with `/plugin marketplace add ./<folder>`. See the README section
+  "Install from a downloaded zip".
+
 ### Changed
 
 - **Renamed from Master-JEV Hook to AskAway Model** (category: decision model). Independent plugin, not affiliated

@@ -302,6 +302,16 @@ Para desinstalar o plugin:
 claude plugin uninstall askaway-model@keepglide
 ```
 
+#### Instale a partir de um zip baixado
+
+Use este caminho no lugar do marketplace quando tiver o `.zip` deste repositório. A raiz tem `.claude-plugin/marketplace.json`, então a pasta extraída é um marketplace local. Os passos 1️⃣ a 4️⃣ continuam valendo: o gateway precisa estar compilado e rodando.
+
+1. Extraia o zip em uma pasta vazia, por exemplo `master-jev-hook-main`.
+2. No Claude Code, rode `/plugin marketplace add ./master-jev-hook-main` (um caminho absoluto também funciona).
+3. Instale pelo painel `/plugin`, com **+ › Add plugins** (Claude Desktop), ou rode `/plugin install askaway-model@keepglide-local`.
+
+Depois, reinicie o Claude Code. O aviso acima vale: use o plugin **ou** o `install.py` para o Claude Code, nunca os dois.
+
 ### 6️⃣ Verifique, sem custo
 
 ```bash

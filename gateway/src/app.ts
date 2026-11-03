@@ -90,7 +90,7 @@ export function createApp({ config, askJev, fetch: fetchImpl = fetch, log: write
     // An HTTPException carries the status and text its thrower chose, such as a 4xx.
     if (error instanceof HTTPException) return error.getResponse();
     console.error(error);
-    return c.json({ error: { message: "master-jev-hook failed while handling the request", type: "server_error" } }, 500);
+    return c.json({ error: { message: "askaway-model failed while handling the request", type: "server_error" } }, 500);
   });
 
   /** One routed request: a line in the log, and a row on the dashboard. */
@@ -315,7 +315,7 @@ export function createApp({ config, askJev, fetch: fetchImpl = fetch, log: write
     const inQuery = c.req.path.startsWith("/dashboard") ? c.req.query("key") : undefined;
     const presented = c.req.header("authorization")?.replace(/^Bearer\s+/i, "") ?? inQuery ?? "";
     if (safeEqual(presented, config.routerApiKey)) return next();
-    return c.json({ error: { message: "Invalid master-jev-hook API key", type: "invalid_api_key" } }, 401);
+    return c.json({ error: { message: "Invalid askaway-model API key", type: "invalid_api_key" } }, 401);
   });
 
   /**

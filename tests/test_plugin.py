@@ -11,7 +11,7 @@ ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 import install  # noqa: E402
 
-PLUGIN_TOOLS = "mcp__plugin_master-jev-hook_master-jev-hook__.*"
+PLUGIN_TOOLS = "mcp__plugin_askaway-model_askaway-model__.*"
 
 
 def load_claude_jev(name):
@@ -30,7 +30,7 @@ class PluginTests(unittest.TestCase):
         for path in (*manifest["skills"], manifest["mcpServers"], manifest["hooks"]):
             self.assertTrue(path.startswith("./"), path)
             self.assertTrue((ROOT / path).exists(), path)
-        self.assertTrue((ROOT / "skills/master-jev-hook/SKILL.md").is_file())
+        self.assertTrue((ROOT / "skills/askaway-model/SKILL.md").is_file())
 
     def test_mcp_server_runs_the_bundled_adapter(self):
         self.assertFalse((ROOT / ".mcp.json").exists())  # Read as project scope, where ${CLAUDE_PLUGIN_ROOT} is not expanded.
@@ -39,8 +39,8 @@ class PluginTests(unittest.TestCase):
         servers = json.loads((ROOT / manifest["mcpServers"]).read_text(encoding="utf-8"))["mcpServers"]
         server = servers[install.NAME]
         self.assertEqual(server["command"], "node")
-        self.assertEqual(server["args"], ["${CLAUDE_PLUGIN_ROOT}/gateway/bin/master-jev-mcp.mjs"])
-        self.assertTrue((ROOT / "gateway/bin/master-jev-mcp.mjs").is_file())
+        self.assertEqual(server["args"], ["${CLAUDE_PLUGIN_ROOT}/gateway/bin/askaway-model-mcp.mjs"])
+        self.assertTrue((ROOT / "gateway/bin/askaway-model-mcp.mjs").is_file())
         self.assertIn("MASTER_JEV_GATEWAY_URL", server["env"])
 
     def test_hooks_mirror_the_installer(self):
@@ -66,7 +66,7 @@ class PluginTests(unittest.TestCase):
             self.assertEqual(path.parent, Path(data) / "state")
             self.assertEqual(path.parent.stat().st_mode & 0o777, 0o700)
         plain = load_claude_jev("claude_jev_plain")
-        self.assertEqual(plain.MCP_PREFIX, "mcp__master-jev-hook__")
+        self.assertEqual(plain.MCP_PREFIX, "mcp__askaway-model__")
         self.assertEqual(plain.state_file("s1", "turn").parent, ROOT / "state")
 
 

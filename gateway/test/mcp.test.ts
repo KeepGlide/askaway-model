@@ -17,7 +17,7 @@ async function runAdapter(handler: RequestListener, calls: unknown[]) {
   const server = createServer(handler);
   server.listen(0, "127.0.0.1"); await once(server, "listening");
   const port = (server.address() as any).port;
-  const child = spawn(process.execPath, [new URL("../bin/master-jev-mcp.mjs", import.meta.url).pathname], { env: { ...process.env, MASTER_JEV_GATEWAY_URL: `http://127.0.0.1:${port}` }, stdio: ["pipe", "pipe", "pipe"] });
+  const child = spawn(process.execPath, [new URL("../bin/askaway-model-mcp.mjs", import.meta.url).pathname], { env: { ...process.env, MASTER_JEV_GATEWAY_URL: `http://127.0.0.1:${port}` }, stdio: ["pipe", "pipe", "pipe"] });
   let output = ""; child.stdout.on("data", (b) => output += b); let err = ""; child.stderr.on("data", (b) => err += b);
   child.stdin.end(calls.map((x) => JSON.stringify(x)).join("\n") + "\n");
   try {

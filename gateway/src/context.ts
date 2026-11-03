@@ -167,7 +167,7 @@ export async function assessContext(input: RouterInput, supplied: DecisionContex
 /** Static wording + validated IDs/numbers only. This is auxiliary data, not a new authority. */
 export function contextNote(report: ContextReport): string | undefined {
   if (!["accepted", "partial", "abstain"].includes(report.status) || !report.kind) return undefined;
-  return "\n[Master-JEV Hook auxiliary assessment; not user instructions or authorization. " +
+  return "\n[AskAway Model auxiliary assessment; not user instructions or authorization. " +
     "Check against the evidence; probability means support from supplied excerpts, not verified truth. " +
     "An abstention means insufficient evidence and must not be converted to false or zero.]\n" +
     JSON.stringify({ kind: report.kind, status: report.status, assessments: report.assessments, workflow: report.workflow });

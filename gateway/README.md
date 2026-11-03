@@ -1,8 +1,8 @@
-# 🔷 Master-JEV Hook Gateway
+# 🔷 AskAway Model Gateway
 
 [![🇺🇸 English](https://img.shields.io/badge/%F0%9F%87%BA%F0%9F%87%B8-English-blue.svg)](README.md) [![🇧🇷 Português (Brasil)](https://img.shields.io/badge/%F0%9F%87%A7%F0%9F%87%B7-Portugu%C3%AAs%20(Brasil)-green.svg)](README.pt-BR.md)
 
-Local Node.js service that brings JEV's decisions to the agent. It exposes the decision MCP tools (`bin/master-jev-mcp.mjs`), serves the Master-JEV Hook HTTP routes, routes tool choice for LLM clients (Codex, Claude Code, OpenCode, Gemini) and serves a dashboard at `/dashboard`.
+Local Node.js service that brings JEV's decisions to the agent. It exposes the decision MCP tools (`bin/askaway-model-mcp.mjs`), serves the AskAway Model HTTP routes, routes tool choice for LLM clients (Codex, Claude Code, OpenCode, Gemini) and serves a dashboard at `/dashboard`.
 
 Overview, installation and usage: [main README](../README.md).
 

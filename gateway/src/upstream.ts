@@ -74,7 +74,7 @@ export async function forward(
     // The target carries the client's query, which may hold a key: never echo it back.
     const message = redactUrls(error instanceof Error ? error.message : String(error));
     return Response.json(
-      { error: { message: `master-jev-hook could not reach upstream: ${message}`, type: "upstream_unreachable" } },
+      { error: { message: `askaway-model could not reach upstream: ${message}`, type: "upstream_unreachable" } },
       { status: 502, headers: options.responseHeaders },
     );
   }

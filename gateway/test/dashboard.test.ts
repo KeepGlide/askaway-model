@@ -145,7 +145,7 @@ describe("createEventLog", () => {
     writeFileSync(
       file,
       [
-        "master-jev-hook listening on http://localhost:8790 → https://llm.test/v1 (jev: jev-latest)",
+        "askaway-model listening on http://localhost:8790 → https://llm.test/v1 (jev: jev-latest)",
         JSON.stringify({ time: "2026-01-01T10:00:00.000Z", ...entry(4), model: "gpt-test", status: 200 }),
         '{"time":"2026-01-01T10:00:01.000Z","event":"route","mo',
         JSON.stringify({ time: "2026-01-01T10:00:02.000Z", event: "route", path: "/v1/responses", tools: 2, mode: "direct", tool: "set_lights", args: { room: "kitchen" }, confidence: 0.9 }),
@@ -172,10 +172,10 @@ describe("GET /dashboard", () => {
     expect(html).not.toMatch(/<(script|link|img)[^>]+(src|href)=/i);
   });
 
-  it("is branded Master-JEV Hook and orders status, hero, numbers, charts, then the details", async () => {
+  it("is branded AskAway Model and orders status, hero, numbers, charts, then the details", async () => {
     const { app } = setup(fakeJev({}).askJev);
     const html = await (await app.request("/dashboard")).text();
-    expect(html).toContain("<title>Master-JEV Hook</title>");
+    expect(html).toContain("<title>AskAway Model</title>");
     expect(html).toContain('<html lang="en">');
     const order = ['id="status"', 'id="hero"', 'id="tiles"', 'id="hourly"', 'id="requests"'].map((mark) => html.indexOf(mark));
     expect(order.every((position) => position > 0)).toBe(true);

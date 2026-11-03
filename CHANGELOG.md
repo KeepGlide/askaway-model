@@ -1,10 +1,27 @@
 # Changelog
 
-All notable changes to Master-JEV Hook. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
+All notable changes to AskAway Model. The format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/);
 versions follow SemVer and the gateway's `package.json`. The measurements behind each entry live in
 [`docs/experiments.md`](docs/experiments.md).
 
 ## [Unreleased]
+
+### Changed
+
+- **Renamed from Master-JEV Hook to AskAway Model** (category: decision model). Independent plugin, not affiliated
+  with or endorsed by TypeSafe AI, Inc.; JEV is a trademark of TypeSafe AI, Inc. TypeSafe logos removed. The product
+  cover still shows the old name and needs a new one.
+  - Ids that changed (`master-jev-hook` to `askaway-model`): plugin id (`askaway-model@keepglide`), MCP server name
+    (`mcp__plugin_askaway-model_askaway-model__*`), skill, guide files (`askaway-model-claude.md`,
+    `askaway-model-claude-chat.md`, `askaway-model-codex.md`, `askaway-model-skill.zip`), the adapter
+    `gateway/bin/askaway-model-mcp.mjs` (was `master-jev-mcp.mjs`) and the rule file `~/.claude/rules/askaway-model.md`.
+    JEV tool names (`jev_*`, `request_decision`) are unchanged.
+  - Kept on purpose (migration note): repository URL and clone folder, host paths (`~/.config/master-jev-hook/`,
+    `~/.local/state/master-jev-hook/`, `~/.local/share/master-jev-hook`, `~/.master-jev-hook/`), the systemd unit
+    `master-jev-hook.service`, managed-block markers (`master-jev-hook-claude:*`, `master-jev-hook:*`),
+    `MASTER_JEV_GATEWAY_URL` and `MASTER_JEV_GATEWAY_KEY`, the launchers `master-jev-codex|claude|gemini|opencode`, and
+    the dashboard storage keys. Existing installs: re-run `install.py` and remove the old `master-jev-hook` MCP
+    entry and `~/.claude/rules/master-jev-hook.md`.
 
 ### Fixed
 

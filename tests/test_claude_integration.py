@@ -54,7 +54,7 @@ class ClaudeIntegrationTests(unittest.TestCase):
             for path in (code, desktop):
                 path.parent.mkdir()
                 path.write_text(json.dumps({"other": "secret", "mcpServers": {
-                    "other-server": {"command": "old"}, "master-jev-hook": {
+                    "other-server": {"command": "old"}, "askaway-model": {
                         "env": {"MASTER_JEV_GATEWAY_KEY": "private", "EXTRA": "kept"}}}}))
             install(home, prefix, "all", code, desktop, node=shutil.which("node"))
             before = {p: p.read_bytes() for p in (home / "settings.json", home / "CLAUDE.md", code, desktop)}
@@ -66,20 +66,20 @@ class ClaudeIntegrationTests(unittest.TestCase):
             self.assertEqual(json.loads(before[home / "settings.json"])["hooks"]["SessionStart"][0], settings["hooks"]["SessionStart"][0])
             # No legacy block in CLAUDE.md: the file is left untouched, byte-exact.
             self.assertEqual(before[home / "CLAUDE.md"].decode(), "Existing instructions\n")
-            chat_guide = (prefix / "master-jev-hook-claude-chat.md").read_text()
+            chat_guide = (prefix / "askaway-model-claude-chat.md").read_text()
             self.assertIn("request_decision", chat_guide)
-            self.assertNotIn("master-jev-hook-claude-chat", before[home / "CLAUDE.md"].decode())
+            self.assertNotIn("askaway-model-claude-chat", before[home / "CLAUDE.md"].decode())
             for path in (code, desktop):
                 data = json.loads(before[path])
                 self.assertEqual(data["other"], "secret")
                 self.assertEqual(data["mcpServers"]["other-server"]["command"], "old")
-                mcp = data["mcpServers"]["master-jev-hook"]
+                mcp = data["mcpServers"]["askaway-model"]
                 self.assertTrue(Path(mcp["command"]).samefile(shutil.which("node")))
-                self.assertEqual(mcp["args"], [str(prefix / "master-jev-mcp.mjs")])
+                self.assertEqual(mcp["args"], [str(prefix / "askaway-model-mcp.mjs")])
                 self.assertEqual(mcp["env"]["MASTER_JEV_GATEWAY_KEY"], "private")
                 self.assertEqual(mcp["env"]["EXTRA"], "kept")
                 self.assertEqual(mcp.get("alwaysLoad"), True if path == code else None)
-            rule = (home / "rules/master-jev-hook.md").read_text()
+            rule = (home / "rules/askaway-model.md").read_text()
             self.assertTrue(rule.startswith("<!-- master-jev-hook-claude:managed -->"))
             self.assertIn("request_decision", rule)
             config = (prefix / "claude_jev.json").read_text()
@@ -91,10 +91,10 @@ class ClaudeIntegrationTests(unittest.TestCase):
                     input=json.dumps({"hook_event_name": "SessionStart", "source": source}),
                     text=True, capture_output=True, check=True, timeout=5)
                 out = json.loads(result.stdout)
-                self.assertTrue(out["systemMessage"].startswith("❌ Master-JEV Hook gateway unreachable"))
+                self.assertTrue(out["systemMessage"].startswith("❌ AskAway Model gateway unreachable"))
                 context = out["hookSpecificOutput"]["additionalContext"]
-                self.assertTrue(context.startswith("Master-JEV Hook tools:"))
-                self.assertIn("\n\nMaster-JEV Hook session check", context)
+                self.assertTrue(context.startswith("AskAway Model tools:"))
+                self.assertIn("\n\nAskAway Model session check", context)
                 self.assertTrue(context.endswith(out["systemMessage"]))
             (prefix / "claude_jev.json").write_text(config)
             hooks = json.loads(before[home / "settings.json"])["hooks"]
@@ -103,9 +103,9 @@ class ClaudeIntegrationTests(unittest.TestCase):
                 ours = [h for g in hooks[event] for h in g["hooks"] if str(home / "hooks/jev_launcher.py") in h["command"]]
                 self.assertEqual(len(ours), count, event)
                 self.assertTrue(all(h["timeout"] <= 20 for h in ours), event)
-            tool = "mcp__master-jev-hook__request_decision"
+            tool = "mcp__askaway-model__request_decision"
             self.assertEqual([g["matcher"] for g in hooks["PreToolUse"]],
-                             ["mcp__master-jev-hook__.*", "Bash"])
+                             ["mcp__askaway-model__.*", "Bash"])
             self.assertEqual(json.loads((prefix / "claude_jev.json").read_text()),
                              {"gateway_url": "http://127.0.0.1:8795", "guide_in_memory": True})
 
@@ -119,7 +119,7 @@ class ClaudeIntegrationTests(unittest.TestCase):
             pre = run("pre", {"hook_event_name": "PreToolUse", "tool_name": tool,
                               "tool_input": {"objective": "Choose the source", "context": {"kind": "comparison"}}})
             self.assertEqual(pre["systemMessage"], "🔷 Consulting JEV now for: Choose the source")
-            pre = run("pre", {"hook_event_name": "PreToolUse", "tool_name": "mcp__master-jev-hook__jev_rank",
+            pre = run("pre", {"hook_event_name": "PreToolUse", "tool_name": "mcp__askaway-model__jev_rank",
                               "tool_input": {"criterion": "Best source", "candidates": []}})
             self.assertEqual(pre["systemMessage"], "🔷 Consulting JEV now for: Best source")
             typed = {"status": "partial", "answers": {
@@ -127,7 +127,7 @@ class ClaudeIntegrationTests(unittest.TestCase):
                 "b": {"type": "score", "status": "ok", "score": 0.75, "confidence": 0.9},
                 "c": {"type": "noul", "status": "ok", "noul": 0.2},
                 "d": {"type": "choice", "status": "abstain"}}}
-            post = run("post", {"hook_event_name": "PostToolUse", "tool_name": "mcp__master-jev-hook__jev_score",
+            post = run("post", {"hook_event_name": "PostToolUse", "tool_name": "mcp__askaway-model__jev_score",
                                 "tool_response": [{"type": "text", "text": json.dumps(typed)}]})
             self.assertEqual(post["systemMessage"], "🔷 JEV answered a=`x` (0.80), b=0.75, c: P(yes)=0.20.")
             answer = {"status": "accepted", "assessments": {"selection": {"status": "accepted",
@@ -279,32 +279,32 @@ class ClaudeIntegrationTests(unittest.TestCase):
             home, prefix, code, desktop = self.paths(Path(directory))
             self.clients(home, desktop.parent)
             install(home, prefix, "all", code, desktop, node=shutil.which("node"))
-            skill = (home / "skills/master-jev-hook/SKILL.md").read_text()
-            self.assertTrue(skill.startswith("---\nname: master-jev-hook\n"))
+            skill = (home / "skills/askaway-model/SKILL.md").read_text()
+            self.assertTrue(skill.startswith("---\nname: askaway-model\n"))
             self.assertIn("<!-- master-jev-hook-claude:managed -->", skill)
-            with zipfile.ZipFile(prefix / "master-jev-hook-skill.zip") as archive:
-                self.assertEqual(archive.namelist(), ["master-jev-hook/SKILL.md"])
-                self.assertEqual(archive.read("master-jev-hook/SKILL.md").decode(), skill)
-            before = (prefix / "master-jev-hook-skill.zip").read_bytes()
+            with zipfile.ZipFile(prefix / "askaway-model-skill.zip") as archive:
+                self.assertEqual(archive.namelist(), ["askaway-model/SKILL.md"])
+                self.assertEqual(archive.read("askaway-model/SKILL.md").decode(), skill)
+            before = (prefix / "askaway-model-skill.zip").read_bytes()
             _, backup = install(home, prefix, "all", code, desktop, node=shutil.which("node"))
             self.assertIsNone(backup)
-            self.assertEqual(before, (prefix / "master-jev-hook-skill.zip").read_bytes())
+            self.assertEqual(before, (prefix / "askaway-model-skill.zip").read_bytes())
             self.assertFalse((home / "CLAUDE.md").exists())  # No legacy block to migrate: never created.
-            rule = (home / "rules/master-jev-hook.md").read_text()
-            self.assertIn("master-jev-hook", rule)
+            rule = (home / "rules/askaway-model.md").read_text()
+            self.assertIn("askaway-model", rule)
             self.assertLess(len(rule), 3500)
 
     def test_legacy_claude_md_block_migrates_to_rule_file(self):
         with tempfile.TemporaryDirectory() as directory:
             home, prefix, code, desktop = self.paths(Path(directory))
             home.mkdir()
-            guide = (installer.ROOT / "master-jev-hook-claude.md").read_text()
+            guide = (installer.ROOT / "askaway-model-claude.md").read_text()
             legacy = ("Before text\n\n<!-- master-jev-hook-claude:begin -->\n" + guide
                       + "\n<!-- master-jev-hook-claude:end -->\n\nAfter text\n")
             (home / "CLAUDE.md").write_text(legacy)
             install(home, prefix, "claude-code", code, desktop, node=shutil.which("node"))
             self.assertEqual((home / "CLAUDE.md").read_text(), "Before text\n\nAfter text\n")
-            rule = (home / "rules/master-jev-hook.md").read_text()
+            rule = (home / "rules/askaway-model.md").read_text()
             self.assertTrue(rule.startswith("<!-- master-jev-hook-claude:managed -->"))
             self.assertIn("request_decision", rule)
             before = (home / "CLAUDE.md").read_bytes()
@@ -316,19 +316,19 @@ class ClaudeIntegrationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as directory:
             home, prefix, code, desktop = self.paths(Path(directory))
             (home / "rules").mkdir(parents=True)
-            (home / "rules/master-jev-hook.md").write_text("mine\n")
-            with self.assertRaisesRegex(ValueError, "master-jev-hook.md"):
+            (home / "rules/askaway-model.md").write_text("mine\n")
+            with self.assertRaisesRegex(ValueError, "askaway-model.md"):
                 install(home, prefix, "claude-code", code, desktop, node=shutil.which("node"))
-            self.assertEqual((home / "rules/master-jev-hook.md").read_text(), "mine\n")
+            self.assertEqual((home / "rules/askaway-model.md").read_text(), "mine\n")
 
     def test_existing_unmanaged_skill_is_not_overwritten(self):
         with tempfile.TemporaryDirectory() as directory:
             home, prefix, code, desktop = self.paths(Path(directory))
-            (home / "skills/master-jev-hook").mkdir(parents=True)
-            (home / "skills/master-jev-hook/SKILL.md").write_text("mine\n")
-            with self.assertRaisesRegex(ValueError, "master-jev-hook"):
+            (home / "skills/askaway-model").mkdir(parents=True)
+            (home / "skills/askaway-model/SKILL.md").write_text("mine\n")
+            with self.assertRaisesRegex(ValueError, "askaway-model"):
                 install(home, prefix, "claude-code", code, desktop, node=shutil.which("node"))
-            self.assertEqual((home / "skills/master-jev-hook/SKILL.md").read_text(), "mine\n")
+            self.assertEqual((home / "skills/askaway-model/SKILL.md").read_text(), "mine\n")
 
     def test_json_configs_with_same_content_keep_their_bytes(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -347,13 +347,13 @@ class ClaudeIntegrationTests(unittest.TestCase):
             home, prefix, code, desktop = self.paths(Path(directory))
             install(home, prefix, "claude-code", code, desktop, node=shutil.which("node"))
             settings = json.loads((home / "settings.json").read_text())
-            settings["hooks"]["PreToolUse"][0]["matcher"] = "mcp__master-jev-hook__request_decision"
+            settings["hooks"]["PreToolUse"][0]["matcher"] = "mcp__askaway-model__request_decision"
             settings["hooks"]["PreToolUse"][0]["hooks"][0]["timeout"] = 3
             (home / "settings.json").write_text(json.dumps(settings))
             install(home, prefix, "claude-code", code, desktop, node=shutil.which("node"))
             groups = json.loads((home / "settings.json").read_text())["hooks"]["PreToolUse"]
             self.assertEqual(len(groups), 2)
-            self.assertEqual(groups[0]["matcher"], "mcp__master-jev-hook__.*")
+            self.assertEqual(groups[0]["matcher"], "mcp__askaway-model__.*")
 
     def test_reinstall_removes_hook_of_a_removed_mode(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -426,7 +426,7 @@ class ClaudeIntegrationTests(unittest.TestCase):
                 {"hooks": [{"type": "command", "command": "other"}]}]}}
             (home / "settings.json").write_text(json.dumps(settings))
             code.parent.mkdir()
-            code.write_text(json.dumps({"mcpServers": {"master-jev-hook": {
+            code.write_text(json.dumps({"mcpServers": {"askaway-model": {
                 "type": "http", "url": "http://example.test"}}}))
             with self.assertRaisesRegex(ValueError, "MCP conflict"):
                 install(home, prefix, "claude-code", code, desktop, node=shutil.which("node"))
@@ -456,7 +456,7 @@ class ClaudeIntegrationTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "Destination paths collide"):
                 install(home, prefix, "all", code, code, node=shutil.which("node"))
             with self.assertRaisesRegex(ValueError, "Destination paths collide"):
-                install(home, prefix, "claude-code", prefix / "master-jev-mcp.mjs", desktop,
+                install(home, prefix, "claude-code", prefix / "askaway-model-mcp.mjs", desktop,
                         node=shutil.which("node"))
             self.assertFalse(prefix.exists())
 
@@ -504,20 +504,20 @@ class CodexTests(unittest.TestCase):
                                  self.root / "desktop.json", codex_home=self.codex, **kw)
 
     def server(self):
-        return tomllib.loads(self.toml.read_text())["mcp_servers"]["master-jev-hook"]
+        return tomllib.loads(self.toml.read_text())["mcp_servers"]["askaway-model"]
 
     def test_new_config_and_managed_agents(self):
         paths, _ = self.install()
         self.assertIn(self.toml, paths)
         server = self.server()
         self.assertTrue(Path(server["command"]).samefile(shutil.which("node")))
-        self.assertEqual(server["args"], [str(self.prefix / "master-jev-mcp.mjs")])
+        self.assertEqual(server["args"], [str(self.prefix / "askaway-model-mcp.mjs")])
         self.assertEqual(server["env"], {"MASTER_JEV_GATEWAY_URL": "http://127.0.0.1:8795"})
         text = self.toml.read_text()
         self.assertTrue(text.startswith("# master-jev-hook:begin\n") and text.endswith("# master-jev-hook:end\n"))
         agents = self.agents.read_text()
         self.assertIn("<!-- master-jev-hook:begin -->", agents)
-        self.assertIn((installer.ROOT / "master-jev-hook-codex.md").read_text().strip(), agents)
+        self.assertIn((installer.ROOT / "askaway-model-codex.md").read_text().strip(), agents)
         self.assertFalse((self.root / "claude").exists())
         _, backup = self.install()
         self.assertIsNone(backup)  # Idempotent.
@@ -568,8 +568,8 @@ class CodexTests(unittest.TestCase):
         self.assertEqual(self.toml.stat().st_mode & 0o777, 0o600)
 
     def test_definition_outside_block_fails_without_changes(self):
-        for original in ('[mcp_servers.master-jev-hook]\ncommand = "mine"\n',
-                         '[mcp_servers]\n"master-jev-hook" = { command = "mine" }\n'):
+        for original in ('[mcp_servers.askaway-model]\ncommand = "mine"\n',
+                         '[mcp_servers]\n"askaway-model" = { command = "mine" }\n'):
             with self.subTest(original=original):
                 self.toml.write_text(original)
                 with self.assertRaisesRegex(ValueError, "outside the"):
@@ -601,5 +601,5 @@ class CodexTests(unittest.TestCase):
         text = self.toml.read_text(encoding="utf-8")
         self.assertIn("🚀", text)  # ensure_ascii=False: sem par substituto 🚀.
         self.assertNotIn("\\ud83d", text)
-        server = tomllib.loads(text)["mcp_servers"]["master-jev-hook"]
-        self.assertEqual(server["args"], [str(prefix / "master-jev-mcp.mjs")])
+        server = tomllib.loads(text)["mcp_servers"]["askaway-model"]
+        self.assertEqual(server["args"], [str(prefix / "askaway-model-mcp.mjs")])

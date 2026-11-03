@@ -1,7 +1,7 @@
 {
-  "name": "master-jev-hook",
+  "name": "askaway-model",
   "version": "1.3.0-beta.2",
-  "description": "JEV decisions for Claude Code: the master-jev-hook MCP tools (request_decision, jev_classify, jev_verify, jev_score, jev_rank), the skill that formulates them, and the hooks that check the gateway, remind the rule and gate risky Bash commands. Needs the local gateway (see README).",
+  "description": "AskAway Model, a decision model for Claude Code: the askaway-model MCP tools (request_decision, jev_classify, jev_verify, jev_score, jev_rank), the skill that formulates them, and the hooks that check the gateway, remind the rule and gate risky Bash commands. Needs the local gateway (see README). Independent plugin, not affiliated with or endorsed by TypeSafe AI, Inc. JEV (TypeSafe's System One model) is the first platform AskAway Model supports. JEV is a trademark of TypeSafe AI, Inc.",
   "author": { "name": "Sophia Phillipa (KeepGlide)", "url": "https://github.com/KeepGlide" },
   "homepage": "https://github.com/KeepGlide/master-jev-hook",
   "repository": "https://github.com/KeepGlide/master-jev-hook",

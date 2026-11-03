@@ -1,6 +1,6 @@
 # Dashboard redesign: mock specification
 
-Four static mocks of the Master-JEV Hook dashboard with the KeepGlide identity. Each mock is one
+Four static mocks of the AskAway Model dashboard with the KeepGlide identity. Each mock is one
 self-contained HTML file in this folder (`a-*.html` … `d-*.html`), opened directly in a browser,
 with no build step, no external fonts and no network calls. The mocks are a visual contract: once
 Sophia picks one, `gateway/src/dashboard.html` is rebuilt from it.
@@ -32,12 +32,12 @@ Marks, in `assets/`:
 
 - `keepglide-icon-256.png`: the KeepGlide company mark (hang-glider on navy). Never recolour it;
   clear space of at least its own width; use it as is on Navy or on a white surface.
-- `master-jev-hook-mark.svg`: the product mark, "the fork" (a question point, two Sky dotted paths
+- `askaway-model-mark.svg`: the product mark, "the fork" (a question point, two Sky dotted paths
   left out, one Teal glide to the Coral point picked), transparent, for navy or dark surfaces.
-- `master-jev-hook-icon.svg`: the same mark on the navy squircle, for light surfaces.
+- `askaway-model-icon.svg`: the same mark on the navy squircle, for light surfaces.
 
-Masthead: product icon + "Master-JEV Hook" + "by KeepGlide" with the company mark small (24–32 px)
-and the tagline. The product name is written exactly `Master-JEV Hook`.
+Masthead: product icon + "AskAway Model" + "by KeepGlide" with the company mark small (24–32 px)
+and the tagline. The product name is written exactly `AskAway Model`.
 
 Outcome colours must stay distinguishable without relying on hue alone (a label or icon
 accompanies every colour): answered = Teal, partial = Teal light, abstain = Sky with a Navy label,

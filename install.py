@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Installs the master-jev-hook MCP server in Claude Code, Claude Desktop and Codex,
+"""Installs the askaway-model MCP server in Claude Code, Claude Desktop and Codex,
 plus the Claude Code hooks and the orchestration instructions."""
 import argparse
 import io
@@ -19,7 +19,7 @@ import zipfile
 from jev_launcher import CANDIDATES
 
 ROOT = Path(__file__).resolve().parent
-NAME = "master-jev-hook"
+NAME = "askaway-model"
 BEGIN = "<!-- master-jev-hook-claude:begin -->"
 END = "<!-- master-jev-hook-claude:end -->"
 CODEX_BEGIN, CODEX_END = "<!-- master-jev-hook:begin -->", "<!-- master-jev-hook:end -->"
@@ -29,7 +29,7 @@ JEV_TOOLS = "mcp__" + NAME + "__.*"
 # (event, matcher, claude_jev.py mode, statusMessage, timeout in s): session instructions and a live gateway test, a
 # reminder of the rule on every message, a visible notice before/after each JEV MCP tool call, and
 # decision points that consult the gateway (always fail-open).
-HOOKS = (("SessionStart", "startup|resume|clear|compact|fork", "hook", "🔷 Master-JEV Hook: checking the gateway with a live JEV test…", 5),
+HOOKS = (("SessionStart", "startup|resume|clear|compact|fork", "hook", "🔷 AskAway Model: checking the gateway with a live JEV test…", 5),
          ("UserPromptSubmit", None, "prompt", None, 3),
          ("PreToolUse", JEV_TOOLS, "pre", "🔷 Consulting JEV…", 3),
          ("PostToolUse", JEV_TOOLS, "post", None, 3),
@@ -46,7 +46,7 @@ def skill_zip(raw):
     """Deterministic ZIP (fixed timestamp) of the skill folder, for upload in Claude Desktop."""
     buffer = io.BytesIO()
     with zipfile.ZipFile(buffer, "w", zipfile.ZIP_DEFLATED) as archive:
-        info = zipfile.ZipInfo("master-jev-hook/SKILL.md", date_time=(2026, 1, 1, 0, 0, 0))
+        info = zipfile.ZipInfo("askaway-model/SKILL.md", date_time=(2026, 1, 1, 0, 0, 0))
         info.compress_type = zipfile.ZIP_DEFLATED
         info.external_attr = 0o644 << 16
         archive.writestr(info, raw)
@@ -250,22 +250,22 @@ def codex_config(old, node, script, gateway_url, path):
              f"env = {{ MASTER_JEV_GATEWAY_URL = {q(gateway_url)} }}")
     new = managed_memory(old, block, TOML_BEGIN, TOML_END)
     if tomllib.loads(new).get("mcp_servers", {}).get(NAME) != expected:
-        raise ValueError("invalid_config: the master-jev-hook block would become invalid in " + str(path))
+        raise ValueError("invalid_config: the askaway-model block would become invalid in " + str(path))
     return new.encode("utf-8")
 
 
 def plan(targets, home, prefix, node, code_config, desktop_config, codex_home, gateway_url):
-    script = prefix / "master-jev-mcp.mjs"
+    script = prefix / "askaway-model-mcp.mjs"
     helper = prefix / "claude_jev.py"
-    guide_path = prefix / "master-jev-hook-claude.md"
-    chat_guide_path = prefix / "master-jev-hook-claude-chat.md"
+    guide_path = prefix / "askaway-model-claude.md"
+    chat_guide_path = prefix / "askaway-model-claude-chat.md"
     helper_config = prefix / "claude_jev.json"
-    skill = (ROOT / "skills/master-jev-hook/SKILL.md").read_bytes()
-    skill_path = home / "skills/master-jev-hook/SKILL.md"
-    rule_path = home / "rules/master-jev-hook.md"
+    skill = (ROOT / "skills/askaway-model/SKILL.md").read_bytes()
+    skill_path = home / "skills/askaway-model/SKILL.md"
+    rule_path = home / "rules/askaway-model.md"
     launcher = home / LAUNCHER
     codex_toml, codex_agents = codex_home / "config.toml", codex_home / "AGENTS.md"
-    destinations = [script, helper, guide_path, chat_guide_path, helper_config, prefix / "master-jev-hook-skill.zip"]
+    destinations = [script, helper, guide_path, chat_guide_path, helper_config, prefix / "askaway-model-skill.zip"]
     if "claude-code" in targets:
         destinations.extend((home / "settings.json", home / "CLAUDE.md", rule_path, code_config, skill_path, launcher))
     if "claude-desktop" in targets:
@@ -275,11 +275,11 @@ def plan(targets, home, prefix, node, code_config, desktop_config, codex_home, g
     normalized = [os.path.normpath(str(path)) for path in destinations]
     if len(normalized) != len(set(normalized)):
         raise ValueError("Destination paths collide")
-    guide = (ROOT / "master-jev-hook-claude.md").read_text(encoding="utf-8")
-    changes = {script: (ROOT / "gateway/bin/master-jev-mcp.mjs").read_bytes(),
+    guide = (ROOT / "askaway-model-claude.md").read_text(encoding="utf-8")
+    changes = {script: (ROOT / "gateway/bin/askaway-model-mcp.mjs").read_bytes(),
                helper: (ROOT / "claude_jev.py").read_bytes(), guide_path: guide.encode("utf-8"),
-               chat_guide_path: (ROOT / "master-jev-hook-claude-chat.md").read_bytes(),
-               prefix / "master-jev-hook-skill.zip": skill_zip(skill)}
+               chat_guide_path: (ROOT / "askaway-model-claude-chat.md").read_bytes(),
+               prefix / "askaway-model-skill.zip": skill_zip(skill)}
     # The Claude Code hooks' own settings: another target must not rewrite a file the claude-code target made
     # (guide_in_memory true), but keeps its own copy current, since scripts/verify.sh reads gateway_url from it.
     try:
@@ -340,7 +340,7 @@ def plan(targets, home, prefix, node, code_config, desktop_config, codex_home, g
         old = codex_toml.read_text(encoding="utf-8") if codex_toml.exists() else ""
         changes[codex_toml] = codex_config(old, node, script, gateway_url, codex_toml)
         old = codex_agents.read_text(encoding="utf-8") if codex_agents.exists() else ""
-        changes[codex_agents] = managed_memory(old, (ROOT / "master-jev-hook-codex.md").read_text(encoding="utf-8").strip(),
+        changes[codex_agents] = managed_memory(old, (ROOT / "askaway-model-codex.md").read_text(encoding="utf-8").strip(),
                                                CODEX_BEGIN, CODEX_END).encode("utf-8")
     for path in changes:
         safe_target(path)
@@ -443,7 +443,7 @@ def main():
                                 args.desktop_config, args.node, args.gateway_url, args.dry_run, args.codex_home)
     except (OSError, ValueError) as error:
         parser.exit(1, "Installation aborted: " + str(error) + "\n")
-    print("Plan validated" if args.dry_run else "Master-JEV Hook installed")
+    print("Plan validated" if args.dry_run else "AskAway Model installed")
     for path in paths:
         print(path)
     if backup:
@@ -454,8 +454,8 @@ def main():
     desktop_config = absolute(args.desktop_config or desktop_default())
     if desktop_config in paths:  # Only print if Desktop is among the targets actually installed.
         print("Claude Desktop: reload the app. For Chat mode to always use the JEV,",
-              "paste into the app/project instructions the text from", args.prefix / "master-jev-hook-claude-chat.md",
-              "and upload the skill", args.prefix / "master-jev-hook-skill.zip", "under Settings -> Capabilities -> Skills.")
+              "paste into the app/project instructions the text from", args.prefix / "askaway-model-claude-chat.md",
+              "and upload the skill", args.prefix / "askaway-model-skill.zip", "under Settings -> Capabilities -> Skills.")
     if not args.dry_run:
         print("Restart the clients to load the MCP server. The HTTP gateway must be available at", args.gateway_url)
 

@@ -105,7 +105,7 @@ describe("proxy integration", () => {
     expect(sent).not.toHaveProperty("master_context");
     expect(sent).not.toHaveProperty("tool_choice");
     expect(sent.temperature).toBe(0.1);
-    expect(sent.messages[0].content).toContain("Master-JEV Hook auxiliary assessment");
+    expect(sent.messages[0].content).toContain("AskAway Model auxiliary assessment");
     expect(sent.messages[0].content).toContain('"probability":0.9');
     const e = s.events.since(0)[0]!;
     expect(e.context).toMatchObject({ applied: true, calls: 2, status: "accepted" });
@@ -134,7 +134,7 @@ describe("proxy integration", () => {
     ] as const) {
       const s = setup(accepted); await (await s.post(body, path)).text();
       const sent = s.upstream.calls[0]!.body;
-      expect(JSON.stringify(sent)).toContain("Master-JEV Hook auxiliary assessment");
+      expect(JSON.stringify(sent)).toContain("AskAway Model auxiliary assessment");
       expect(sent).not.toHaveProperty("master_context");
       if (path === "/v1/messages") expect(sent.messages[0].content[0]).toEqual(body.messages![0]!.content[0]);
     }

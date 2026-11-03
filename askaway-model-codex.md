@@ -1,6 +1,6 @@
-## Master-JEV Hook in Codex
+## AskAway Model in Codex
 
-**Mandatory rule:** whenever a task decision admits explicit eligible alternatives, of any kind (approach, reading, source, classification, parameter, review, next action), consult the JEV (MCP `master-jev-hook`) and wait for the result before deciding. With a single valid option or an already-resolved decision, proceed directly. Higher-level instructions and the user's explicit decisions take precedence.
+**Mandatory rule:** whenever a task decision admits explicit eligible alternatives, of any kind (approach, reading, source, classification, parameter, review, next action), consult the JEV (MCP `askaway-model`) and wait for the result before deciding. With a single valid option or an already-resolved decision, proceed directly. Higher-level instructions and the user's explicit decisions take precedence.
 
 **Goal: save agent tokens and use the JEV at scale.** Before reading, comparing or judging several items, delegate the triage to the JEV: `request_decision` for choices with an objective, candidates with short IDs, criterion and minimal evidence; `jev_rank`, `jev_classify`, `jev_verify` and `jev_score` for batches, with several independent questions in a single call. Do not ask the JEV for free text; map the chosen ID to the action. Reference: https://docs.typesafe.ai.
 

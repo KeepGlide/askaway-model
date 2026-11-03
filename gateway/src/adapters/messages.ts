@@ -148,7 +148,7 @@ function build(req: MessagesRequest, call: DirectCall) {
     id: `msg_jev_${hex(12)}`,
     type: "message",
     role: "assistant",
-    model: req.model ?? "master-jev-hook",
+    model: req.model ?? "askaway-model",
     content: [block],
     stop_reason: "tool_use",
     stop_sequence: null,

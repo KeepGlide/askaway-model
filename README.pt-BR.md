@@ -1,10 +1,14 @@
 <div align="center">
 
-<img src="assets/master-jev-hook-cover-1600x400.png" alt="Master-JEV Hook: Decisões de agentes, delegadas ao JEV." width="100%" />
+<img src="assets/master-jev-hook-cover-1600x400.png" alt="AskAway Model: Decisões de agentes, delegadas ao JEV." width="100%" />
 
-# 🔷 Master-JEV Hook
+# 🔷 AskAway Model
 
 [![🇺🇸 English](https://img.shields.io/badge/%F0%9F%87%BA%F0%9F%87%B8-English-blue.svg)](README.md) [![🇧🇷 Português (Brasil)](https://img.shields.io/badge/%F0%9F%87%A7%F0%9F%87%B7-Portugu%C3%AAs%20(Brasil)-green.svg)](README.pt-BR.md)
+
+**AskAway Model é um modelo de decisão para agentes de código.**
+
+> Plugin independente, sem afiliação nem endosso da TypeSafe AI, Inc. O JEV (modelo System One da TypeSafe) é a primeira plataforma que o AskAway Model suporta. JEV é marca registrada da TypeSafe AI, Inc.
 
 **Um serviço local que envia as escolhas do Claude Code, do Claude Desktop e do Codex ao JEV, o motor de decisões da TypeSafe, e registra cada consulta.**
 
@@ -54,7 +58,7 @@
 
 ## 💡 Por que existe
 
-Agentes decidem muita coisa sozinhos: qual abordagem seguir, qual fonte ler, qual próxima ação tomar, como classificar ou pontuar um lote de itens. O Master-JEV Hook entrega essas escolhas ao JEV, o motor de decisões da TypeSafe, por um servidor MCP chamado `master-jev-hook`. O Claude Code, o Claude Desktop e o Codex o chamam, e um gateway local registra cada consulta em um painel.
+Agentes decidem muita coisa sozinhos: qual abordagem seguir, qual fonte ler, qual próxima ação tomar, como classificar ou pontuar um lote de itens. O AskAway Model entrega essas escolhas ao JEV, o motor de decisões da TypeSafe, por um servidor MCP chamado `askaway-model`. O Claude Code, o Claude Desktop e o Codex o chamam, e um gateway local registra cada consulta em um painel.
 
 É para quem usa esses agentes e quer que cada escolha explícita seja checada pelo JEV, com um registro visível do que foi perguntado e respondido.
 
@@ -65,18 +69,18 @@ O que ele **não** faz:
 
 ## 🎁 O que entrega
 
-- **Cinco ferramentas de decisão via MCP:** `request_decision` para uma escolha entre abordagens, e `jev_classify`, `jev_verify`, `jev_score` e `jev_rank` para lotes. Depois da instalação, `/mcp` no Claude Code lista o servidor `master-jev-hook` ([Uso](#-uso)).
+- **Cinco ferramentas de decisão via MCP:** `request_decision` para uma escolha entre abordagens, e `jev_classify`, `jev_verify`, `jev_score` e `jev_rank` para lotes. Depois da instalação, `/mcp` no Claude Code lista o servidor `askaway-model` ([Uso](#-uso)).
 - **O risco define a barra:** cada consulta declara seu risco. Uma resposta de Choice ou Score só conta acima do limiar daquele risco (0,65, 0,80 ou 0,90 por padrão). Abaixo dele, o cliente usa a alternativa local e não repete a decisão ([Limiares de confiança](#limiares-de-confiança-por-risco)).
 - **A chave fica no gateway:** o adaptador MCP nunca guarda a chave da TypeSafe, que vive só no arquivo de ambiente do gateway (`~/.config/master-jev-hook/gateway.env`, modo 600).
 - **Um painel para cada resposta:** `http://127.0.0.1:8795/dashboard` mostra as contagens de respondidas e sem decisão, as requisições por hora e a confiança frente aos limiares, em inglês ou português, em tema claro ou escuro ([Painel](#-painel)).
 - **Hooks do Claude Code que nunca bloqueiam a sessão:** um erro, um timeout ou uma abstenção não para a sessão. Só um comando que desliga o gateway pode ser bloqueado ([Hooks do Claude Code](#hooks-do-claude-code)).
 - **Um instalador para três clientes:** o `install.py` configura o Claude Code, o Claude Desktop e o Codex. Ele valida o plano inteiro antes de gravar, é idempotente e faz backup do que substitui ([Configuração](#%EF%B8%8F-configuração)).
-- **Plugin opcional do Claude Code:** `claude plugin install master-jev-hook@keepglide` substitui o passo do instalador só para o Claude Code ([caminho do plugin](#-instalação)).
+- **Plugin opcional do Claude Code:** `claude plugin install askaway-model@keepglide` substitui o passo do instalador só para o Claude Code ([caminho do plugin](#-instalação)).
 - **Verificação sem custo:** `scripts/verify.sh` checa o gateway, os arquivos instalados e a configuração de cada cliente sem chamada paga ([Instalação](#-instalação), passo 6️⃣).
 
 ## 📸 Screenshots
 
-![Painel do Master-JEV Hook no tema escuro, em inglês: cabeçalho com a marca de bifurcação, linha de status, os cartões principais Answered e No decision, seis blocos, os gráficos de requisições por hora e de confiança](docs/dashboard/screenshots/dashboard-dark-en.jpg)
+![Painel do AskAway Model no tema escuro, em inglês: cabeçalho com a marca de bifurcação, linha de status, os cartões principais Answered e No decision, seis blocos, os gráficos de requisições por hora e de confiança](docs/dashboard/screenshots/dashboard-dark-en.jpg)
 
 ![O mesmo painel no tema claro](docs/dashboard/screenshots/dashboard-light-en.jpg)
 
@@ -85,7 +89,7 @@ O que ele **não** faz:
 O pacote tem três partes:
 
 - o **gateway HTTP** (`gateway/`, TypeScript em Node), que monta a pergunta para o JEV, chama a API da TypeSafe e serve o painel;
-- o **adaptador MCP via stdio** (`gateway/bin/master-jev-mcp.mjs`), registrado como o servidor `master-jev-hook` nos clientes suportados;
+- o **adaptador MCP via stdio** (`gateway/bin/askaway-model-mcp.mjs`), registrado como o servidor `askaway-model` nos clientes suportados;
 - só para o Claude Code, um conjunto de **hooks** (`claude_jev.py`) que injetam a regra de orquestração na sessão, anunciam cada consulta ao JEV e fazem verificações pontuais: um comando de Bash arriscado, uma conclusão sem verificação, o que manter durante uma compactação.
 
 O gateway usa o SDK oficial da TypeSafe, o [`@typesafe-ai/sdk`](https://www.npmjs.com/package/@typesafe-ai/sdk) **0.6.0**, como `devDependency` (`^0.6.0` em `gateway/package.json`, fixado pelo `pnpm-lock.yaml`), só pelos tipos TypeScript: o formato da requisição e das respostas. A chamada em si é um `POST` HTTPS direto ao endpoint SystemOne do JEV (`https://api.typesafe.ai/v1/systemone` por padrão; OpenRouter ou Vercel AI Gateway por `JEV_PROVIDER`), com timeout. Tenta de novo só quando a API não processou a requisição: nos códigos 429, 503 e 529, ou quando a conexão é recusada ou não resolvida (`ECONNREFUSED`, `ENOTFOUND`, `EAI_AGAIN`); nunca em timeout nem em outros 5xx. Esses tipos definem exatamente três modos de pergunta: **Choice** (escolhe uma opção), **Score** (avalia numa escala ordenada) e **Noul** (probabilidade de sim). As quatro ferramentas de lote `jev_classify` (Choice), `jev_verify` (Noul), `jev_score` (Score) e `jev_rank` (Score) são construídas sobre eles.
@@ -100,7 +104,7 @@ flowchart LR
         CX[Codex]
     end
     subgraph Local["Máquina local"]
-        MCP["master-jev-mcp.mjs\n(stdio/JSON-RPC)"]
+        MCP["askaway-model-mcp.mjs\n(stdio/JSON-RPC)"]
         GW["Gateway HTTP\n127.0.0.1:8795"]
         DASH["/dashboard"]
     end
@@ -117,7 +121,7 @@ flowchart LR
     GW --> DASH
 ```
 
-O cliente chama uma ferramenta MCP; o adaptador `master-jev-mcp.mjs` traduz a chamada em uma requisição HTTP ao gateway local; o gateway monta a pergunta para o JEV (Choice, Score ou Noul), consulta a API da TypeSafe e devolve o resultado. O adaptador MCP não guarda a chave da API; ela fica só no ambiente do gateway.
+O cliente chama uma ferramenta MCP; o adaptador `askaway-model-mcp.mjs` traduz a chamada em uma requisição HTTP ao gateway local; o gateway monta a pergunta para o JEV (Choice, Score ou Noul), consulta a API da TypeSafe e devolve o resultado. O adaptador MCP não guarda a chave da API; ela fica só no ambiente do gateway.
 
 ### Percurso de uma pergunta
 
@@ -125,7 +129,7 @@ O cliente chama uma ferramenta MCP; o adaptador `master-jev-mcp.mjs` traduz a ch
 sequenceDiagram
     participant C as Claude (harness)
     participant H as hooks do claude_jev.py
-    participant M as master-jev-mcp.mjs
+    participant M as askaway-model-mcp.mjs
     participant G as Gateway 127.0.0.1:8795
     participant J as JEV (api.typesafe.ai/v1/systemone)
     C->>H: PreToolUse
@@ -251,7 +255,7 @@ python3 install.py --target all
 
 A opção `--target` e as demais opções do instalador estão em [Configuração](#%EF%B8%8F-configuração). O plano inteiro é validado antes de qualquer gravação; a instalação é idempotente e faz backup do que substitui.
 
-Depois de instalar, reinicie os clientes: sessões já abertas não recebem as novas instruções. No Claude Code, `/mcp` lista o servidor `master-jev-hook` e `/hooks` mostra os hooks instalados.
+Depois de instalar, reinicie os clientes: sessões já abertas não recebem as novas instruções. No Claude Code, `/mcp` lista o servidor `askaway-model` e `/hooks` mostra os hooks instalados.
 
 ### 🧩 Claude Code: instale como plugin (no lugar do passo 5)
 
@@ -262,15 +266,15 @@ claude plugin marketplace add KeepGlide/claude-plugins
 ```
 
 ```bash
-claude plugin install master-jev-hook@keepglide
+claude plugin install askaway-model@keepglide
 ```
 
 Depois, reinicie o Claude Code.
 
 O plugin oferece:
 
-- a skill `master-jev-hook`, invocada como `/master-jev-hook:master-jev-hook`;
-- o servidor MCP: `/mcp` mostra `plugin:master-jev-hook:master-jev-hook`, e as ferramentas se chamam `mcp__plugin_master-jev-hook_master-jev-hook__<ferramenta>`;
+- a skill `askaway-model`, invocada como `/askaway-model:askaway-model`;
+- o servidor MCP: `/mcp` mostra `plugin:askaway-model:askaway-model`, e as ferramentas se chamam `mcp__plugin_askaway-model_askaway-model__<ferramenta>`;
 - os mesmos hooks do Claude Code que o `install.py` registra (teste ao vivo no SessionStart, lembrete da regra, anúncios do JEV, portão de Bash, checagem no Stop, PreCompact, desvio), com o estado guardado na pasta de dados do plugin.
 
 Ele não cobre:
@@ -290,12 +294,12 @@ Para verificar o caminho do plugin:
 claude plugin list
 ```
 
-Ele mostra `master-jev-hook@keepglide` com `Version: 1.3.0-beta.2`. O `scripts/verify.sh` verifica só o caminho do `install.py`.
+Ele mostra `askaway-model@keepglide` com `Version: 1.3.0-beta.2`. O `scripts/verify.sh` verifica só o caminho do `install.py`.
 
 Para desinstalar o plugin:
 
 ```bash
-claude plugin uninstall master-jev-hook@keepglide
+claude plugin uninstall askaway-model@keepglide
 ```
 
 ### 6️⃣ Verifique, sem custo
@@ -334,10 +338,10 @@ Ou abra `http://127.0.0.1:8795/dashboard` direto no navegador.
 | 4 | 🧑 Arquivo de ambiente privado | os comandos do passo 3️⃣ da Instalação, depois peça ao humano para preencher `TYPESAFE_API_KEY` e `JEV_LOG_FILE` | `~/.config/master-jev-hook/gateway.env` existe com modo `600`; um arquivo existente é mantido, nunca sobrescrito nem aberto |
 | 5 | Conferir a porta | `curl -s http://127.0.0.1:8795/health` | nenhuma resposta (porta livre), ou `"status":"ok"` de um gateway já rodando: então pule o passo 6. Qualquer outra coisa: pare e pergunte |
 | 6 | 🧑 Serviço do gateway | os comandos do passo 4️⃣ da Instalação | `curl -s http://127.0.0.1:8795/health` retorna `"status":"ok"` |
-| 7 | 🧑 Instalar nos clientes | `python3 install.py --dry-run`; mostre o plano e pergunte qual `--target`; depois `python3 install.py --target <alvo>` | `Plan validated`, depois `Master-JEV Hook installed` e um caminho `Backup:` |
-| 7b | 🧑 Opcional, só Claude Code: instalar como plugin no lugar do passo 7 para o Claude Code | `claude plugin marketplace add KeepGlide/claude-plugins`, depois `claude plugin install master-jev-hook@keepglide` | Código de saída 0, e `claude plugin list` mostra `master-jev-hook@keepglide` com `Version: 1.3.0-beta.2` |
+| 7 | 🧑 Instalar nos clientes | `python3 install.py --dry-run`; mostre o plano e pergunte qual `--target`; depois `python3 install.py --target <alvo>` | `Plan validated`, depois `AskAway Model installed` e um caminho `Backup:` |
+| 7b | 🧑 Opcional, só Claude Code: instalar como plugin no lugar do passo 7 para o Claude Code | `claude plugin marketplace add KeepGlide/claude-plugins`, depois `claude plugin install askaway-model@keepglide` | Código de saída 0, e `claude plugin list` mostra `askaway-model@keepglide` com `Version: 1.3.0-beta.2` |
 | 8 | Verificar, sem custo | `scripts/verify.sh` | última linha `All good.` e código de saída 0. Com o 7b, as checagens do Claude Code imprimem `FAIL` (a skill, o arquivo de regra e os hooks vêm do `install.py`, não do plugin): última linha `N item(s) failed`, código de saída 1; isso é esperado |
-| 9 | Devolver ao humano | peça ao humano para reiniciar os clientes | a próxima sessão do Claude Code começa com `🔷 Master-JEV Hook gateway active: live JEV test passed` |
+| 9 | Devolver ao humano | peça ao humano para reiniciar os clientes | a próxima sessão do Claude Code começa com `🔷 AskAway Model gateway active: live JEV test passed` |
 
 ✅ **Pronto quando** os passos 1–8 baterem com **Esperado**. Reporte o resultado de cada passo, o caminho do backup do passo 7 e qualquer passo pulado. Para desfazer, siga a seção [Desinstalação](#-desinstalação).
 
@@ -354,13 +358,13 @@ O modelo do JEV é fixado pelo `JEV_MODEL` no `gateway.env` ([Problemas conhecid
 
 Toda instalação que altera algo grava um backup em `PREFIX/backups/<timestamp>/`, com o conteúdo anterior de cada arquivo tocado e um `restore.json` (`backup: null` indica um arquivo criado por aquela instalação, não um arquivo substituído). Para restaurar, feche os clientes e copie de volta só os destinos desejados daquele backup, apagando os que tinham `backup: null`.
 
-Se você instalou o plugin do Claude Code, remova-o com `claude plugin uninstall master-jev-hook@keepglide`, e tire o marketplace com `claude plugin marketplace remove keepglide`.
+Se você instalou o plugin do Claude Code, remova-o com `claude plugin uninstall askaway-model@keepglide`, e tire o marketplace com `claude plugin marketplace remove keepglide`.
 
 Para desinstalar manualmente (se a instalação usou `CLAUDE_CONFIG_DIR`, troque `~/.claude` e `~/.claude.json` abaixo por `$CLAUDE_CONFIG_DIR` e `$CLAUDE_CONFIG_DIR/.claude.json`, respectivamente):
 
-- Remova a entrada `mcpServers.master-jev-hook` de `~/.claude.json` e de `claude_desktop_config.json`.
+- Remova a entrada `mcpServers.askaway-model` de `~/.claude.json` e de `claude_desktop_config.json`.
 - Remova, em `~/.claude/settings.json`, os hooks cujo comando roda `claude_jev.py` ou `hooks/jev_launcher.py`.
-- Remova `~/.claude/rules/master-jev-hook.md` (só se a primeira linha ainda tiver o marcador `<!-- master-jev-hook-claude:managed -->`), qualquer bloco `master-jev-hook-claude` que sobrou em `~/.claude/CLAUDE.md` (instalações antigas gravavam o guia ali) e a pasta `~/.claude/skills/master-jev-hook/`.
+- Remova `~/.claude/rules/askaway-model.md` (só se a primeira linha ainda tiver o marcador `<!-- master-jev-hook-claude:managed -->`), qualquer bloco `master-jev-hook-claude` que sobrou em `~/.claude/CLAUDE.md` (instalações antigas gravavam o guia ali) e a pasta `~/.claude/skills/master-jev-hook/`.
 - Remova o bloco `# master-jev-hook:begin`/`# master-jev-hook:end` de `$CODEX_HOME/config.toml` e o bloco `<!-- master-jev-hook:begin -->`/`<!-- master-jev-hook:end -->` de `$CODEX_HOME/AGENTS.md`.
 - Apague `PREFIX` (padrão `~/.local/share/master-jev-hook`).
 
@@ -390,7 +394,7 @@ Depois de instalado, o agente chama as ferramentas por conta própria quando uma
 
 ### Carregamento das ferramentas
 
-O servidor MCP marca as 5 ferramentas com `_meta["anthropic/alwaysLoad"]: true`, e o instalador grava um `"alwaysLoad": true` no nível do servidor para a entrada `master-jev-hook` em `~/.claude.json`, mas só para o Claude Code, não para a configuração do Claude Desktop. Isso mantém as ferramentas carregadas desde o início na CLI e em execuções sem interface. O aplicativo Claude Desktop, ainda assim, as deixa atrás do `ToolSearch` (bug upstream [anthropics/claude-code#86284](https://github.com/anthropics/claude-code/issues/86284), [#88483](https://github.com/anthropics/claude-code/issues/88483)), por isso o hook `SessionStart` (veja a tabela de hooks abaixo) pede um `ToolSearch` próprio logo no início.
+O servidor MCP marca as 5 ferramentas com `_meta["anthropic/alwaysLoad"]: true`, e o instalador grava um `"alwaysLoad": true` no nível do servidor para a entrada `askaway-model` em `~/.claude.json`, mas só para o Claude Code, não para a configuração do Claude Desktop. Isso mantém as ferramentas carregadas desde o início na CLI e em execuções sem interface. O aplicativo Claude Desktop, ainda assim, as deixa atrás do `ToolSearch` (bug upstream [anthropics/claude-code#86284](https://github.com/anthropics/claude-code/issues/86284), [#88483](https://github.com/anthropics/claude-code/issues/88483)), por isso o hook `SessionStart` (veja a tabela de hooks abaixo) pede um `ToolSearch` próprio logo no início.
 
 ### Limiares de confiança por risco
 
@@ -412,11 +416,11 @@ Todos os hooks são fail-open: erro, timeout, abstenção do JEV ou confiança a
 
 | Evento | O que faz |
 | --- | --- |
-| `SessionStart` | Injeta a regra de orquestração na sessão, se ela ainda não estiver carregada como regra do Claude Code (`~/.claude/rules/master-jev-hook.md`); depois de uma compactação, reinjeta o que o JEV marcou como relevante. Também roda um autoteste ao vivo e pago (uma chamada ao gateway, cerca de 300 ms e cerca de 530 tokens): a mesma pergunta em cada modalidade do JEV (Choice, Score, Noul), com ✅/⚠️/❌ por modalidade. Diz `Master-JEV Hook gateway active` só quando as três responderam corretamente, e o Claude imprime o resultado completo literalmente no topo da próxima resposta, já que o aplicativo de desktop não mostra o `systemMessage` do SessionStart. Nessa mesma resposta, se as 5 ferramentas do JEV aparecerem como adiadas, pede também uma única chamada de `ToolSearch` no início para carregá-las (pulada quando já estão carregadas), confirmada com `🔷 MCP Master-JEV Hook loaded: <n>/5 tools ready.` |
+| `SessionStart` | Injeta a regra de orquestração na sessão, se ela ainda não estiver carregada como regra do Claude Code (`~/.claude/rules/askaway-model.md`); depois de uma compactação, reinjeta o que o JEV marcou como relevante. Também roda um autoteste ao vivo e pago (uma chamada ao gateway, cerca de 300 ms e cerca de 530 tokens): a mesma pergunta em cada modalidade do JEV (Choice, Score, Noul), com ✅/⚠️/❌ por modalidade. Diz `AskAway Model gateway active` só quando as três responderam corretamente, e o Claude imprime o resultado completo literalmente no topo da próxima resposta, já que o aplicativo de desktop não mostra o `systemMessage` do SessionStart. Nessa mesma resposta, se as 5 ferramentas do JEV aparecerem como adiadas, pede também uma única chamada de `ToolSearch` no início para carregá-las (pulada quando já estão carregadas), confirmada com `🔷 MCP AskAway Model loaded: <n>/5 tools ready.` |
 | `UserPromptSubmit` | Lembrete da regra acionado por gatilho em cada mensagem: chame `request_decision` antes de qualquer decisão com alternativas explícitas, faça triagem de 3 ou mais itens e confira afirmações com as ferramentas de lote, com consultas enxutas |
 | `PreToolUse` (ferramentas do gateway) | Anuncia antes de cada consulta ao JEV |
 | `PostToolUse` (ferramentas do gateway) | Anuncia o resultado da consulta |
-| `PreToolUse` (Bash) | Se um filtro local achar o comando arriscado, pergunta ao JEV se você precisa ser consultado; só pergunta a você quando o JEV tem ≥ 0,80 de certeza de que o comando é grave, irreversível e além do que você pediu; senão vale o fluxo normal de permissão. No modo `bypassPermissions` nunca pergunta: o veredito só é anotado na mensagem de status e registrado. Envia suas últimas 3 mensagens (redigidas, truncadas) como contexto, para que os comandos que você pediu rodem sem perguntas. Um comando que desliga o gateway `master-jev-hook` (`systemctl` com `stop`/`disable`/`mask`/`kill`) é conferido contra o seu pedido: se o pedido exigir, roda; senão é bloqueado com um motivo para o agente. Você nunca é perguntado sobre ele, e o portão nunca libera um comando por conta própria |
+| `PreToolUse` (Bash) | Se um filtro local achar o comando arriscado, pergunta ao JEV se você precisa ser consultado; só pergunta a você quando o JEV tem ≥ 0,80 de certeza de que o comando é grave, irreversível e além do que você pediu; senão vale o fluxo normal de permissão. No modo `bypassPermissions` nunca pergunta: o veredito só é anotado na mensagem de status e registrado. Envia suas últimas 3 mensagens (redigidas, truncadas) como contexto, para que os comandos que você pediu rodem sem perguntas. Um comando que desliga o gateway `askaway-model` (`systemctl` com `stop`/`disable`/`mask`/`kill`) é conferido contra o seu pedido: se o pedido exigir, roda; senão é bloqueado com um motivo para o agente. Você nunca é perguntado sobre ele, e o portão nunca libera um comando por conta própria |
 | `Stop` | Se houve uma edição sem verificação depois, pergunta ao JEV; avisa o agente, no máximo três vezes por sessão |
 | `PreCompact` | Pergunta ao JEV, mensagem por mensagem, o que vale preservar antes de compactar |
 | `PostToolUse` (todas as ferramentas) | A cada 30 chamadas de ferramenta, pergunta ao JEV se a sessão ainda está no rumo, travada ou saiu do escopo |
@@ -456,14 +460,14 @@ Com a variável de ambiente `CLAUDE_CONFIG_DIR` definida, o `install.py` grava `
 
 No modo Chat, o Claude Desktop enxerga o servidor MCP, mas não lê o `CLAUDE.md`, as regras do Claude Code, nem roda os hooks do Claude Code. Para ter o mesmo nível de instrução nesse modo, o instalador gera dois arquivos no prefixo de instalação:
 
-- `master-jev-hook-claude-chat.md`: instruções equivalentes às do Claude Code, em texto puro, para colar como instrução de aplicativo ou projeto.
-- `master-jev-hook-skill.zip`: a skill `master-jev-hook` empacotada, para enviar em Settings → Capabilities → Skills.
+- `askaway-model-claude-chat.md`: instruções equivalentes às do Claude Code, em texto puro, para colar como instrução de aplicativo ou projeto.
+- `askaway-model-skill.zip`: a skill `askaway-model` empacotada, para enviar em Settings → Capabilities → Skills.
 
 ## 💻 Codex
 
 O `install.py` grava, entre marcadores gerenciados, dois blocos:
 
-- Em `$CODEX_HOME/config.toml`, entre `# master-jev-hook:begin` e `# master-jev-hook:end`: a seção `[mcp_servers.master-jev-hook]`, com o comando do Node, o caminho do adaptador e `MASTER_JEV_GATEWAY_URL` no ambiente.
+- Em `$CODEX_HOME/config.toml`, entre `# master-jev-hook:begin` e `# master-jev-hook:end`: a seção `[mcp_servers.askaway-model]`, com o comando do Node, o caminho do adaptador e `MASTER_JEV_GATEWAY_URL` no ambiente.
 - Em `$CODEX_HOME/AGENTS.md`, entre `<!-- master-jev-hook:begin -->` e `<!-- master-jev-hook:end -->`: a regra de orquestração para o Codex.
 
 `$CODEX_HOME` segue a variável de ambiente `CODEX_HOME`, com padrão `~/.codex`.
@@ -495,7 +499,7 @@ Os limiares não ficam fixos na página: o gateway envia seus limiares de risco 
 - [docs/dashboard/mocks/SPEC.md](docs/dashboard/mocks/SPEC.md): os mocks do painel e o contrato deles.
 - [gateway/README.pt-BR.md](gateway/README.pt-BR.md): os comandos e os testes do gateway.
 - [gateway/.env.example](gateway/.env.example): todas as variáveis do gateway.
-- Guias dos clientes, instalados pelo `install.py`: [master-jev-hook-claude.md](master-jev-hook-claude.md) (regra do Claude Code), [master-jev-hook-claude-chat.md](master-jev-hook-claude-chat.md) (Claude Desktop, modo Chat), [master-jev-hook-codex.md](master-jev-hook-codex.md) (Codex).
+- Guias dos clientes, instalados pelo `install.py`: [askaway-model-claude.md](askaway-model-claude.md) (regra do Claude Code), [askaway-model-claude-chat.md](askaway-model-claude-chat.md) (Claude Desktop, modo Chat), [askaway-model-codex.md](askaway-model-codex.md) (Codex).
 
 ## 🔒 Segurança e privacidade
 
@@ -504,7 +508,7 @@ Cada consulta ao JEV — pelas ferramentas MCP ou pelos hooks — é uma chamada
 O que cada caminho envia ao JEV (a chave da API nunca sai do processo do gateway):
 
 - **Ferramentas MCP:** exatamente os argumentos que o agente passa (objetivo, candidatos, critério, evidências, itens, estado, risco).
-- **Portão de Bash** (só para comandos da lista de comandos arriscados): o comando (até 4.000 caracteres), o diretório de trabalho, a descrição do comando feita pelo agente e suas últimas 3 mensagens (redigidas, até 700 caracteres cada). Comandos que desligam o gateway `master-jev-hook` enviam o mesmo, sem o diretório de trabalho.
+- **Portão de Bash** (só para comandos da lista de comandos arriscados): o comando (até 4.000 caracteres), o diretório de trabalho, a descrição do comando feita pelo agente e suas últimas 3 mensagens (redigidas, até 700 caracteres cada). Comandos que desligam o gateway `askaway-model` enviam o mesmo, sem o diretório de trabalho.
 - **Checagem do Stop** (só depois de um turno que editou arquivos sem rodar testes): o último pedido do usuário (até 2.000 caracteres), os caminhos dos arquivos editados, os comandos rodados depois da última edição e a mensagem final do agente (até 3.000 caracteres).
 - **Compactação** (PreCompact): até 32 mensagens do próprio usuário, tiradas da transcrição (até 1.500 caracteres cada).
 - **Detector de desvio** (a cada 30 chamadas de ferramenta): o último pedido do usuário mais os quatro anteriores (até 1.500 caracteres cada), os últimos 1.000 caracteres da resposta do agente logo antes do pedido e, para as chamadas de ferramenta mais recentes, só o nome da ferramenta, o caminho do arquivo ou o comando, e se falhou — nunca conteúdo de arquivos, trechos de edição ou saída de ferramenta.
@@ -523,7 +527,7 @@ Para relatar uma vulnerabilidade, siga o [SECURITY.md](SECURITY.md): não abra u
 | Sintoma | Causa | Correção |
 | --- | --- | --- |
 | O gateway não sobe na `8795`, ou a porta responde de outro processo | Outro processo usa a porta | Escolha uma porta livre e defina-a em `PORT` (`gateway.env`), no `--gateway-url` do instalador e em qualquer hook já configurado ([Instalação](#-instalação), passo 4️⃣) |
-| Cada hook roda duas vezes e as ferramentas são registradas duas vezes | O Claude Code tem o plugin e o `install.py --target claude-code` ao mesmo tempo | Mantenha um caminho: `claude plugin uninstall master-jev-hook@keepglide`, ou remova as entradas do instalador para o Claude Code pelos passos de [Desinstalação](#-desinstalação) |
+| Cada hook roda duas vezes e as ferramentas são registradas duas vezes | O Claude Code tem o plugin e o `install.py --target claude-code` ao mesmo tempo | Mantenha um caminho: `claude plugin uninstall askaway-model@keepglide`, ou remova as entradas do instalador para o Claude Code pelos passos de [Desinstalação](#-desinstalação) |
 | O histórico do painel fica vazio depois de um reinício | `JEV_LOG_FILE` não está definido | Defina um caminho absoluto em `gateway.env` e reinicie o serviço ([Painel](#-painel)) |
 | O gateway recusa iniciar com "is not a loopback address" | `HOST` não é loopback e não há `ROUTER_API_KEY` | Mantenha `HOST=127.0.0.1`, ou defina `ROUTER_API_KEY` e `UPSTREAM_API_KEY` juntos |
 | O gateway diz que a chave do JEV está faltando | `TYPESAFE_API_KEY` está vazia no `gateway.env` | Preencha no arquivo, nunca no chat. O gateway imprime uma linha de aviso ao iniciar, e cada chamada ao JEV informa a variável ausente |

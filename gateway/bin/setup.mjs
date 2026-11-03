@@ -46,10 +46,10 @@ export async function validateKey(provider, key, fetchImpl = fetch) {
   try {
     const response = await fetchImpl(provider.url, {
       method: "POST",
-      headers: { authorization: `Bearer ${key}`, "content-type": "application/json", "x-title": "master-jev-hook" },
+      headers: { authorization: `Bearer ${key}`, "content-type": "application/json", "x-title": "askaway-model" },
       body: JSON.stringify({
         model: provider.model,
-        state: "master-jev-hook setup check",
+        state: "askaway-model setup check",
         questions: { ok: { type: "noul", instructions: "Is this a setup check?" } },
       }),
       signal: AbortSignal.timeout(15_000),

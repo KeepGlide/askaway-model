@@ -131,7 +131,7 @@ function buildDecision(args) {
 const tools = [
   {
     name: "request_decision",
-    description: "Asks the Master-JEV Hook gateway for a choice among real alternatives, a logical evaluation, or evidence-based support. Send objective, criterion and data; the gateway builds the query. The result does not grant permissions nor prove factual truth.",
+    description: "Asks the AskAway Model gateway for a choice among real alternatives, a logical evaluation, or evidence-based support. Send objective, criterion and data; the gateway builds the query. The result does not grant permissions nor prove factual truth.",
     inputSchema: { type: "object", additionalProperties: false, required: ["objective", "context"], properties: {
       objective: text8000,
       context: { type: "object", additionalProperties: false, required: ["kind"], properties: {
@@ -217,7 +217,7 @@ for await (const line of createInterface({ input: process.stdin, crlfDelay: Infi
   if (message.id === undefined) continue;
   if (message.method === "initialize") {
     const supported = ["2025-11-25", "2025-06-18", "2025-03-26", "2024-11-05"];
-    reply(message.id, { protocolVersion: supported.includes(message.params?.protocolVersion) ? message.params.protocolVersion : "2025-06-18", capabilities: { tools: {} }, instructions, serverInfo: { name: "master-jev-hook", version: "1.3.0-beta.2" } });
+    reply(message.id, { protocolVersion: supported.includes(message.params?.protocolVersion) ? message.params.protocolVersion : "2025-06-18", capabilities: { tools: {} }, instructions, serverInfo: { name: "askaway-model", version: "1.3.0-beta.2" } });
   } else if (message.method === "ping") reply(message.id, {});
   // alwaysLoad keeps Claude Code from deferring these tools behind ToolSearch, which cost a turn per consult.
   else if (message.method === "tools/list") reply(message.id, { tools: tools.map(({ name, description, inputSchema }) => ({ name, description, inputSchema, _meta: { "anthropic/alwaysLoad": true } })) });

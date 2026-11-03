@@ -23,6 +23,6 @@ const app = createApp({
 serve({ fetch: app.fetch, hostname: config.host, port: config.port }, ({ port }) => {
   // Origin and path only: the upstream URL may carry userinfo or a token in its query.
   const upstream = new URL(config.upstreamBaseUrl);
-  console.log(`master-jev-hook listening on http://localhost:${port} → ${upstream.origin}${upstream.pathname} (jev: ${config.jevModel} via ${config.jevProvider})`);
+  console.log(`askaway-model listening on http://localhost:${port} → ${upstream.origin}${upstream.pathname} (jev: ${config.jevModel} via ${config.jevProvider})`);
   console.log(`dashboard: http://localhost:${port}/dashboard`);
 });

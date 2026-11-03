@@ -1,6 +1,6 @@
 # Third-party notices
 
-Master-JEV Hook is an original project. Parts of the code under `gateway/`
+AskAway Model is an original project. Parts of the code under `gateway/`
 were initially based on the [jev-gateway](https://github.com/vinilana/jev-gateway)
 project, by Vinicius Lana, at commit `a197836755671fc224cc3d7f91a8592d56ca665c`
 (version 0.4.1), distributed under the MIT license. Since then the code has

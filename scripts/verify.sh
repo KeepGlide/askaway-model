@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Checks the gateway and the Master-JEV Hook integration in Claude Code, Claude Desktop and Codex, no paid query.
+# Checks the gateway and the AskAway Model integration in Claude Code, Claude Desktop and Codex, no paid query.
 # Usage: scripts/verify.sh   (exits with 1 if any item fails; missing clients are skipped)
 set -u
 REPO=$(cd "$(dirname "$0")/.." && pwd)
@@ -19,7 +19,7 @@ failures=0
 ok() { printf '  ok     %s\n' "$1"; }
 fail() { printf '  FAIL   %s\n' "$1"; failures=$((failures + 1)); }
 check() { if eval "$2" >/dev/null 2>&1; then ok "$1"; else fail "$1"; fi; }
-mcp_json() { check "MCP in $1" "python3 -c \"import json,sys;assert 'master-jev-hook' in json.load(open(sys.argv[1]))['mcpServers']\" '$1'"; }
+mcp_json() { check "MCP in $1" "python3 -c \"import json,sys;assert 'askaway-model' in json.load(open(sys.argv[1]))['mcpServers']\" '$1'"; }
 # Portable permission check: GNU stat (-c) on one system, BSD/macOS stat (-f) on the other.
 perm() { stat -c %a "$1" 2>/dev/null || stat -f %Lp "$1" 2>/dev/null; }
 
@@ -33,15 +33,15 @@ fi
 check "dist built" "[ -f '$REPO/gateway/dist/index.js' ]"
 
 echo "Installed files match the repository ($PREFIX)"
-for f in claude_jev.py master-jev-hook-claude.md master-jev-hook-claude-chat.md; do
+for f in claude_jev.py askaway-model-claude.md askaway-model-claude-chat.md; do
   check "$f" "cmp -s '$REPO/$f' '$PREFIX/$f'"
 done
-check "master-jev-mcp.mjs" "cmp -s '$REPO/gateway/bin/master-jev-mcp.mjs' '$PREFIX/master-jev-mcp.mjs'"
+check "askaway-model-mcp.mjs" "cmp -s '$REPO/gateway/bin/askaway-model-mcp.mjs' '$PREFIX/askaway-model-mcp.mjs'"
 
 echo "Claude Code"
 if [ -d "$CLAUDE_HOME" ]; then
-  check "master-jev-hook skill" "cmp -s '$REPO/skills/master-jev-hook/SKILL.md' '$CLAUDE_HOME/skills/master-jev-hook/SKILL.md'"
-  check "guide rule file" "grep -q 'master-jev-hook-claude:managed' '$CLAUDE_HOME/rules/master-jev-hook.md'"
+  check "askaway-model skill" "cmp -s '$REPO/skills/askaway-model/SKILL.md' '$CLAUDE_HOME/skills/askaway-model/SKILL.md'"
+  check "guide rule file" "grep -q 'master-jev-hook-claude:managed' '$CLAUDE_HOME/rules/askaway-model.md'"
   check "jev_launcher.py (Claude Code hooks)" "cmp -s '$REPO/jev_launcher.py' '$CLAUDE_HOME/hooks/jev_launcher.py'"
   mcp_json "$CLAUDE_JSON"
   python3 - "$CLAUDE_HOME/settings.json" <<'PY' || failures=$((failures + 1))
@@ -65,7 +65,7 @@ if [ -d "$(dirname "$DESKTOP")" ]; then mcp_json "$DESKTOP"; else echo "  skippe
 
 echo "Codex"
 if [ -d "$CODEX" ]; then
-  check "MCP in the master-jev-hook block of config.toml" "python3 -c \"import sys,tomllib;t=open(sys.argv[1]).read();assert '# master-jev-hook:begin' in t;assert 'master-jev-hook' in tomllib.loads(t)['mcp_servers']\" '$CODEX/config.toml'"
+  check "MCP in the askaway-model block of config.toml" "python3 -c \"import sys,tomllib;t=open(sys.argv[1]).read();assert '# master-jev-hook:begin' in t;assert 'askaway-model' in tomllib.loads(t)['mcp_servers']\" '$CODEX/config.toml'"
   check "managed block in AGENTS.md" "grep -q 'master-jev-hook:begin' '$CODEX/AGENTS.md'"
 else
   echo "  skipped (no $CODEX)"

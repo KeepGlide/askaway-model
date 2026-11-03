@@ -1,15 +1,15 @@
 ---
-name: master-jev-hook
-description: Delegates decisions, triage, classification, ranking and verification between explicit alternatives to the JEV (TypeSafe) through the master-jev-hook gateway's MCP tools (request_decision, jev_classify, jev_verify, jev_score, jev_rank). Use when about to read, compare or judge several items, when a structured JEV judgment would save Claude tokens, or when writing Choice, Score or Noul questions. Loaded on demand by the main session and any agent; no agent preloads it.
+name: askaway-model
+description: Delegates decisions, triage, classification, ranking and verification between explicit alternatives to the JEV (TypeSafe) through the askaway-model gateway's MCP tools (request_decision, jev_classify, jev_verify, jev_score, jev_rank). Use when about to read, compare or judge several items, when a structured JEV judgment would save Claude tokens, or when writing Choice, Score or Noul questions. Loaded on demand by the main session and any agent; no agent preloads it.
 metadata:
   domain: decision
   owner: sophia-phillipa
   created: "2026-09-25"
-  canonical-exception: "kind?: mirrors the master-jev-hook MCP server and installer; name referenced by global rules and hooks"
+  canonical-exception: "kind?: mirrors the askaway-model MCP server and installer; name referenced by global rules and hooks"
 ---
 <!-- master-jev-hook-claude:managed -->
 
-# Master-JEV Hook: formulating calls to the JEV
+# AskAway Model: formulating calls to the JEV
 
 Goal: **save Claude tokens and use the JEV at scale**. The JEV is a decision
 model (System One): it receives a *state* and typed questions and returns a
@@ -35,7 +35,7 @@ Required reading before changing a pattern: https://docs.typesafe.ai
 Mandatory rule: when a decision has explicit eligible alternatives, call
 `request_decision` and wait for the result before deciding; triage 3+ items
 and check claims with the batch tools (full triggers in
-`master-jev-hook-claude.md`). Keep queries lean: ids, names and short
+`askaway-model-claude.md`). Keep queries lean: ids, names and short
 snippets, never whole files. With a single valid option or an
 already-resolved decision, proceed directly.
 

@@ -1,7 +1,7 @@
 {
-  "name": "master-jev-hook",
+  "name": "askaway-model",
   "version": "1.3.0-beta.2",
-  "description": "Master-JEV Hook gateway: JEV decisions via MCP and HTTP, tool routing for LLM clients, and a local dashboard",
+  "description": "AskAway Model gateway: JEV decisions via MCP and HTTP, tool routing for LLM clients, and a local dashboard",
   "keywords": [
     "llm",
     "gateway",

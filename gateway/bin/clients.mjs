@@ -100,9 +100,9 @@ function opencodeInlineConfig(origin) {
     provider: {
       [OPENCODE_PROVIDER]: {
         npm: "@ai-sdk/openai-compatible",
-        name: "Master-JEV Hook",
+        name: "AskAway Model",
         options: { baseURL: `${origin}/v1`, apiKey: "{env:OPENAI_API_KEY}" },
-        models: { [model]: { name: `Master-JEV Hook (${model})` } },
+        models: { [model]: { name: `AskAway Model (${model})` } },
       },
     },
   };

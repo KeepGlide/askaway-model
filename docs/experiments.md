@@ -143,7 +143,7 @@ Sophia ran `install.py --target claude-code` on 2026-10-18 (backup under `~/.loc
   open. Hooks cannot load tools (their output is text only; #89049 asks for a tool-registry API). Both flags stay:
   they work in the CLI and headless runs, and cost nothing in the desktop app. Retry when #86284/#88483 are fixed.
 - **Workaround added:** the SessionStart context asks for one ToolSearch with the 5 JEV tools at the start
-  (skipped when they are already loaded) and a confirmation line `🔷 MCP Master-JEV Hook loaded: <n>/5 tools
+  (skipped when they are already loaded) and a confirmation line `🔷 MCP AskAway Model loaded: <n>/5 tools
   ready.` read from what the model actually has. The request sits before the verbatim status block so it is
   never printed as part of it. Cost: one tool turn per session, instead of one before the first consult.
   Measured on Opus 5.5 (1 h cache): 2,796 cache-write + 65,135 cache-read + ~150 output tokens ≈ $0.04 once per

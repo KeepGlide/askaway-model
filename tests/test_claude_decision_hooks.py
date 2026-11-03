@@ -59,7 +59,7 @@ class DecisionHookTests(unittest.TestCase):
         self.addCleanup(self.gateway.close)
         self.helper = self.dir / "claude_jev.py"
         shutil.copy(ROOT / "claude_jev.py", self.helper)
-        shutil.copy(ROOT / "master-jev-hook-claude.md", self.dir / "master-jev-hook-claude.md")
+        shutil.copy(ROOT / "askaway-model-claude.md", self.dir / "askaway-model-claude.md")
         self.configure(self.gateway.url)
 
     def configure(self, url):
@@ -164,7 +164,7 @@ class DecisionHookTests(unittest.TestCase):
                              "systemctl --user --now disable master-jev-hook", "systemctl -q --user stop master-jev-hook.service")
 
     def test_bash_gate_lets_the_gateway_turn_off_when_the_request_requires_it(self):
-        transcript = self.conversation("Uninstall the Master-JEV Hook gateway")
+        transcript = self.conversation("Uninstall the AskAway Model gateway")
         for command in self.SELF_DISABLE_COMMANDS:
             self.gateway.replies.append((200, choice("off", "required", 0.95)))
             out = self.run_hook("bash-gate", self.bash(command, transcript))
@@ -174,7 +174,7 @@ class DecisionHookTests(unittest.TestCase):
         self.assertEqual(body["risk"], "medium")
         self.assertEqual(set(body["questions"]), {"off"})
         self.assertEqual(set(body["questions"]["off"]["criteria"]), {"required", "not_required"})
-        self.assertEqual(body["state"]["request"], ["Uninstall the Master-JEV Hook gateway"])
+        self.assertEqual(body["state"]["request"], ["Uninstall the AskAway Model gateway"])
         self.assertNotIn("cwd", body["state"])
         self.assertEqual(len(self.gateway.requests), len(self.SELF_DISABLE_COMMANDS))
 
@@ -316,22 +316,22 @@ class DecisionHookTests(unittest.TestCase):
         self.assertEqual(body["risk"], "low")
         self.assertEqual({q["type"] for q in body["questions"].values()}, {"choice", "score", "noul"})
         message = out["systemMessage"]
-        self.assertEqual(message, "🔷 Master-JEV Hook gateway active: live JEV test passed (1 paid call, 280 ms, 540 tokens):\n\n"
+        self.assertEqual(message, "🔷 AskAway Model gateway active: live JEV test passed (1 paid call, 280 ms, 540 tokens):\n\n"
                                   "* Choice: picks one option ✅\n* Score: rates on a scale ✅\n* Noul: probability of yes ✅")
         context = out["hookSpecificOutput"]["additionalContext"]
         self.assertIn("print the block below verbatim", context)
         self.assertTrue(context.endswith(message))
         # The tool-loading request comes before the verbatim block, so it is never printed as part of it.
-        load = context.index("select:mcp__master-jev-hook__request_decision,mcp__master-jev-hook__jev_classify")
+        load = context.index("select:mcp__askaway-model__request_decision,mcp__askaway-model__jev_classify")
         self.assertLess(load, context.index("print the block below verbatim"))
-        self.assertIn("🔷 MCP Master-JEV Hook loaded: <n>/5 tools ready.", context)
+        self.assertIn("🔷 MCP AskAway Model loaded: <n>/5 tools ready.", context)
 
     def test_session_start_flags_wrong_or_missing_answers(self):
         reply = self.probe_reply(choice="false")
         reply["answers"]["noul"] = {"type": "noul", "status": "abstain"}
         self.gateway.replies.append((200, reply))
         message = self.run_hook("hook", {"hook_event_name": "SessionStart", "source": "startup"})["systemMessage"]
-        self.assertTrue(message.startswith("⚠️ Master-JEV Hook gateway reachable, but the live JEV test passed 1/3"))
+        self.assertTrue(message.startswith("⚠️ AskAway Model gateway reachable, but the live JEV test passed 1/3"))
         self.assertNotIn("gateway active", message)
         self.assertIn("* Choice: picks one option ⚠️", message)
         self.assertIn("* Score: rates on a scale ✅", message)
@@ -345,7 +345,7 @@ class DecisionHookTests(unittest.TestCase):
         self.assertIn("passed 0/3 (no JEV call made: routing_disabled)", message)
         self.configure("http://127.0.0.1:9")
         message = self.run_hook("hook", {"hook_event_name": "SessionStart", "source": "startup"})["systemMessage"]
-        self.assertEqual(message, "❌ Master-JEV Hook gateway unreachable at http://127.0.0.1:9; "
+        self.assertEqual(message, "❌ AskAway Model gateway unreachable at http://127.0.0.1:9; "
                                   "JEV decisions fall back to local alternatives.")
 
     # --- Compaction ----------------------------------------------------------------------------

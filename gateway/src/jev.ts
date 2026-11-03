@@ -104,7 +104,7 @@ export function createAskJev(config: Pick<Config, "jevProvider" | "jevApiKey" | 
           "content-type": "application/json",
           // OpenRouter attributes traffic by these; the others ignore them.
           "http-referer": "https://github.com/KeepGlide/master-jev-hook",
-          "x-title": "master-jev-hook",
+          "x-title": "askaway-model",
         },
         body: JSON.stringify(request),
         signal: signal ? AbortSignal.any([signal, AbortSignal.timeout(config.jevTimeoutMs)]) : AbortSignal.timeout(config.jevTimeoutMs),

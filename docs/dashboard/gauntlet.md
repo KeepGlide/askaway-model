@@ -2,7 +2,7 @@
 
 ## 1. Summary
 
-- **What:** a four-round critique of the Master-JEV Hook dashboard page (`gateway/src/dashboard.html`) by 25 personas in five groups (designers, UI/UX, product owners, marketing and advertising, leadership). Each round: five critics in parallel, a consolidator, JEV triage, then two implementer packages on the same file.
+- **What:** a four-round critique of the AskAway Model dashboard page (`gateway/src/dashboard.html`) by 25 personas in five groups (designers, UI/UX, product owners, marketing and advertising, leadership). Each round: five critics in parallel, a consolidator, JEV triage, then two implementer packages on the same file.
 - **When:** 2026-10-18, against the live page on port 8795. Screenshots at 1300 px (rounds 1 and 2) and 1568 px (rounds 3 and 4), dark and light, plus 390 px. Screenshots are not kept in the repository.
 - **Models:** Haiku 5.5 at high for the designer, UI/UX and product critics and for all implementers; Sonnet 5.5 at medium for marketing; Opus 5.5 at medium for leadership and arbitration.
 - **Triage:** JEV triage sorted each round's findings into adopt and skip. Where the JEV abstained, the local call was made and recorded in the round file (round 3: `request_decision` abstained at confidence 0.47).

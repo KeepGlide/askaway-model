@@ -1,8 +1,8 @@
-# Template for the Master-JEV Hook gateway service (systemd --user).
+# Template for the AskAway Model gateway service (systemd --user).
 # To install: replace @REPO@ (absolute checkout path) and @NODE@ (absolute node >= 22.15) and copy
 # to ~/.config/systemd/user/. See the README, gateway service section.
 [Unit]
-Description=Master-JEV Hook gateway
+Description=AskAway Model gateway
 After=network-online.target
 Wants=network-online.target
 StartLimitIntervalSec=120

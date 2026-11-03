@@ -19,7 +19,7 @@ try {
  for(let n=0;!output.includes('dashboard:')&&n<100;n++)await new Promise(r=>setTimeout(r,50));
  const base=output.match(/dashboard: (http:\/\/localhost:\d+)/)?.[1]?.replace('localhost','127.0.0.1');assert.ok(base,output);
  assert.equal((await(await fetch(base+'/health')).json()).status,'ok');assert.equal((await fetch(base+'/dashboard')).status,200);
- mcp=spawn(process.execPath,[root+'/bin/master-jev-mcp.mjs'],{cwd:env.HOME,env:{PATH:process.env.PATH,HOME:env.HOME,MASTER_JEV_GATEWAY_URL:base},stdio:['pipe','pipe','pipe']});let data='';mcp.stdout.on('data',b=>data+=b);
+ mcp=spawn(process.execPath,[root+'/bin/askaway-model-mcp.mjs'],{cwd:env.HOME,env:{PATH:process.env.PATH,HOME:env.HOME,MASTER_JEV_GATEWAY_URL:base},stdio:['pipe','pipe','pipe']});let data='';mcp.stdout.on('data',b=>data+=b);
  const args={objective:'Offline fixture',context:{kind:'comparison',criterion:'offline',candidates:[{id:'offline',text:'offline calculator'},{id:'online',text:'website'}]}};
  mcp.stdin.end([{jsonrpc:'2.0',id:1,method:'initialize',params:{protocolVersion:'2025-06-18'}},{jsonrpc:'2.0',id:2,method:'tools/list'},{jsonrpc:'2.0',id:3,method:'tools/call',params:{name:'request_decision',arguments:args}}].map(JSON.stringify).join('\n')+'\n');
  const [code]=await once(mcp,'exit');assert.equal(code,0);const rows=data.trim().split('\n').map(JSON.parse);assert.equal(rows[1].result.tools[0].name,'request_decision');assert.equal(JSON.parse(rows[2].result.content[0].text).assessments.selection.choice,'offline');
